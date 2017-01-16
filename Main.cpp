@@ -3,30 +3,36 @@ LinkedLists Part 2 - Use of Linked Lists to hold, modify, and display a list of 
 
 #include <iostream>
 #include <string.h>
+#include <iomanip>
+#include <limits>
 #include "Student.h"
 #include "Node.h"
 
 using namespace std;
 
+int getInt(char* message);
+float getFloat(char* message);
 void getInput(char* input);
 void trimWhitespace(char* text);
 void setLowercase(char* text);
 void addStudent(Node* & head);
+void deleteStudent(Node* & head);
 void display(Node* head);
+void average(Node* head);
+
 
 int main()
 {
   Node* head = NULL;
   bool running = true;
   char input[81];
-  int idDelete = 0;
 
   while(running){
     cout << "Awaiting input: ";
     getInput(input);
     //if input = QUIT, then end the program
     if(strcmp(input, "quit") == 0){
-      cout << "Program Terminated." << endl;
+      cout << "\nProgram Terminated." << endl;
       running = false;
     }
     //if input = ADD, then add a student
@@ -35,6 +41,12 @@ int main()
     }
     else if(strcmp(input, "print") == 0){
       display(head);
+    }
+    else if(strcmp(input, "average") == 0){
+      average(head);
+    }
+    else if(strcmp(input, "delete") == 0){
+      deleteStudent(head);
     }
   }
 
@@ -47,30 +59,75 @@ void addStudent(Node* & head){
   char nameLast[81];
   int id;
   float gpa;
-  cout << "\n-----ADDING STUDENT-----\n";
+  cout << "\n-----ADDING STUDENT-------\n";
   cout << "Enter first name: ";
   cin.getline(nameFirst, 81);
   cout << "Enter last name: ";
   cin.getline(nameLast, 81);
-  cout << "Enter student ID: ";
-  cin >> id;
-  cin.ignore(80,'\n');
-  cout << "Enter student GPA: ";
-  cin >> gpa;
+  id = getInt("Enter student ID: ");
+  gpa = getFloat("Enter student GPA: ");
   cin.ignore(80, '\n');
   Student* s = new Student(nameFirst, nameLast, id, gpa);
   Node* n = new Node(s);
-  Node* current = head;
-  if(current == NULL){
-    //cout << "set head" << endl;
+  if(head == NULL){
     head = n;
-    //display(head);
+  }
+  else if(head->getStudent()->getId() > id){
+    n->setNext(head);
+    head = n;
   }
   else{
-    while(current->getNext() != NULL){
+    Node* current = head;
+    while(current->getNext() != NULL &&
+	  (current->getNext()->getStudent()->getId() <= id)){
       current = current->getNext();
     }
+    n->setNext(current->getNext());
     current->setNext(n);
+  }
+  cout << "\n";
+}
+
+void deleteStudent(Node* & head){
+  cout << "\n-----DELETING STUDENT------\n";
+  //tell the user if there are no students
+  if(head == NULL){
+    cout << "\nThere are no students stored.\n" << endl;
+  }
+  else{
+    int idDelete = getInt("Enter ID of student to delete: ");
+    //if the id of Node* head matches the id to be deleted, set head to the next Node* in the list if it exists, otherwise set head to null
+    if(head->getStudent()->getId() == idDelete){
+      cout << "\nDeleted student '" << head->getStudent()->getName() << "', " << head->getStudent()->getId() << ", " << fixed << setprecision(2) << head->getStudent()->getGpa() << "\n\n";
+      if(head->getNext() == NULL){
+    	delete head;
+    	head = NULL;
+      }
+      else{
+    	Node* n = head->getNext();
+    	delete head;
+    	head = n;
+      }
+    }
+    else{
+      Node* current = head;
+      //iterate through the list until we find a Node* where its next Node* has a student that matches the id to be deleted
+      while(current->getNext() != NULL && current->getNext()->getStudent()->getId() != idDelete){
+	current = current->getNext();
+      }
+      //tell the user if no student matching that id was found
+      if(current->getNext() == NULL){
+	cout << "\nNo students found with ID: " << idDelete << "\n\n";
+      }
+      //delete specified student and fix the links between the other Node*'s
+      else{
+	Node* n = current->getNext()->getNext();
+	cout << "\nDeleted student '" << current->getNext()->getStudent()->getName() << "', " << current->getNext()->getStudent()->getId() << ", " << fixed << setprecision(2) << current->getNext()->getStudent()->getGpa() << "\n\n";
+	delete current->getNext();
+	current->setNext(n);
+      }
+    }
+    cin.ignore(81,'\n');
   }
 }
 
@@ -82,13 +139,79 @@ void display(Node* head){
   else{
     Node* current = head;
     while(current != NULL){
-      cout << current->getStudent()->getName() << ", " << current->getStudent()->getId() << ", " << current->getStudent()->getGpa() << endl;
+      cout << current->getStudent()->getName() << ", " << current->getStudent()->getId() << ", " << fixed << setprecision(2) << current->getStudent()->getGpa() << endl;
       current = current->getNext();
     }
   }
+  cout << "\n---------------------------\n";
+}
+
+void average(Node* head){
+  float total = 0;
+  float average = 0;
+  int students = 0;
+  if(head == NULL){
+    cout << "There are no students stored." << endl;
+  }
+  else{
+    Node* current = head;
+    while(current != NULL){
+      total += current->getStudent()->getGpa();
+      students++;
+      current = current->getNext();
+    }
+    average = total / students;
+    cout << "\nNumber of students: " << students << "  Average GPA: "<< fixed << setprecision(2) << average << "\n\n";
+  }
+
 }
 
 
+//prompts the user for an integer
+int getInt(char* message)
+{
+  int number;
+  bool valid = false;
+  while (!valid){
+    cout << message;
+    cin >> number;
+    //delete excess whitespace
+    while (cin.peek() == ' '){
+      cin.ignore(1);
+    }
+    if(cin.peek() != '\n'){
+      cin.clear();
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    else{
+      valid = true;
+    }
+  }
+  return number;
+}
+
+//prompts the user for a float
+float getFloat(char* message)
+{
+  float number;
+  bool valid = false;
+  while (!valid){
+    cout << message;
+    cin >> number;
+    //delete excess whitespace
+    while (cin.peek() == ' '){
+      cin.ignore(1);
+    }
+    if(cin.peek() != '\n'){
+      cin.clear();
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    else{
+      valid = true;
+    }
+  }
+  return number;
+}
 
 //stores user input into a char*
 void getInput(char* input){
