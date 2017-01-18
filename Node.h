@@ -1,24 +1,20 @@
-#ifndef NODE_H
-#define NODE_H
-
-//Header file for Node.cpp
-//Node for linked lists of Student class
-//Stores values: next Node* and stored Student*
-
-#include <iostream>
-#include "Student.h"
-
+#pragma once
+#include<vector>
+#include<map>
+#include<iostream>
+#include<stdio.h>
+#include "string.h"
+#include "student.h"
 using namespace std;
 
-class Node {
+class Node{
  public:
-  Node(Student*);
-  ~Node();
-  Node* getNext();
-  void setNext(Node*);
-  Student* getStudent();
+  Node(Student*); //Constructor
+  ~Node(); //Deconstructor
+  Node* getNext(); //Get next Node pointer
+  Student* getStudent(); //Get student pointer
+  void setNext(Node*); //Set the next pointer to the corresponding node pointer
  protected:
   Student* student;
-  Node* next;
+  Node* node;
 };
-#endif

@@ -21,11 +21,16 @@ void display(Node* head);
 void average(Node* head);
 
 
+
 int main()
 {
   Node* head = NULL;
   bool running = true;
   char input[81];
+
+  cout << "\nWelcome to the new and improved Student List v2.0!\n";
+  cout << "Your commands are: add, print, average, delete, and quit.\n\n";
+  
 
   while(running){
     cout << "Awaiting input: ";
@@ -59,13 +64,16 @@ void addStudent(Node* & head){
   char nameLast[81];
   int id;
   float gpa;
+  char msg[81];
   cout << "\n-----ADDING STUDENT-------\n";
   cout << "Enter first name: ";
   cin.getline(nameFirst, 81);
   cout << "Enter last name: ";
   cin.getline(nameLast, 81);
-  id = getInt("Enter student ID: ");
-  gpa = getFloat("Enter student GPA: ");
+  strcpy(msg, "Enter student ID: ");
+  id = getInt(msg);
+  strcpy(msg, "Enter student GPA: ");
+  gpa = getFloat(msg);
   cin.ignore(80, '\n');
   Student* s = new Student(nameFirst, nameLast, id, gpa);
   Node* n = new Node(s);
@@ -89,13 +97,15 @@ void addStudent(Node* & head){
 }
 
 void deleteStudent(Node* & head){
+  char msg[81];
+  strcpy(msg, "Enter ID of student to delete: ");
   cout << "\n-----DELETING STUDENT------\n";
   //tell the user if there are no students
   if(head == NULL){
     cout << "\nThere are no students stored.\n" << endl;
   }
   else{
-    int idDelete = getInt("Enter ID of student to delete: ");
+    int idDelete = getInt(msg);
     //if the id of Node* head matches the id to be deleted, set head to the next Node* in the list if it exists, otherwise set head to null
     if(head->getStudent()->getId() == idDelete){
       cout << "\nDeleted student '" << head->getStudent()->getName() << "', " << head->getStudent()->getId() << ", " << fixed << setprecision(2) << head->getStudent()->getGpa() << "\n\n";
