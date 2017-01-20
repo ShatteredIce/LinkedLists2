@@ -2,7 +2,7 @@
 #define STUDENT_H
 
 //Student class, stored in Node*'s
-//Stores an integer id
+//Stores a char* name, int id, and float gpa, with corresponding accessors.
 
 #include <iostream>
 
